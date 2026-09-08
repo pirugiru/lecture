@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>컴퓨터는 어떻게 움직이는가 - 수업용 인터랙티브 웹앱</title>
+  <link rel="stylesheet" href="css/style.css?v=17">
+</head>
+<body>
+
+  <!-- 상단 헤더 & 네비게이션 -->
+  <header class="app-header">
+    <div class="header-brand">
+      <span class="brand-icon">💻</span>
+      <div>
+        <h1 class="brand-title">컴퓨터는 어떻게 움직이는가</h1>
+      </div>
+    </div>
+
+    <nav class="nav-steps-bar" aria-label="수업 단계 네비게이션">
+      <button class="nav-step-item active" data-view="pre">0. 첫 생각</button>
+      <button class="nav-step-item" data-view="mod1">1. 작업 순서</button>
+      <button class="nav-step-item" data-view="mod2">2. 작업 나누기</button>
+      <button class="nav-step-item" data-view="mod3">3. 공유 자원</button>
+      <button class="nav-step-item" data-view="mod4">4. 분야 연결</button>
+      <button class="nav-step-item" data-view="post">5. 생각 비교</button>
+    </nav>
+
+    <div class="header-controls">
+      <div class="seed-badge-group" title="현재 시뮬레이션 시드 (모든 학생 PC에서 동일한 문제 생성)">
+        <span class="seed-label">SEED</span>
+        <span class="seed-code" id="top-seed-display">CS-DEMO-01</span>
+        <button class="btn-icon-tiny" id="btn-copy-seed" title="시드 복사">📋</button>
+      </div>
+      <button class="btn-teacher-entry" id="btn-open-teacher-modal">
+        <span>👨‍🏫</span> 강사 모드
+      </button>
+    </div>
+  </header>
+
+  <main class="main-wrapper">
+
+    <!-- ==================== 0. 수업 전 생각 ==================== -->
+    <section id="section-pre" class="app-section">
+      <div class="section-hero">
+        <span class="badge badge-primary">STEP 0 | 기존 인식 꺼내기</span>
+        <h2 class="section-title">컴퓨터공학에 대한 나의 첫 생각</h2>
+        <p class="section-desc">지금 머릿속에 떠오르는 생각을 솔직하게 적어보세요. 정확한 용어를 몰라도 괜찮고, 맞고 틀린 정답도 없습니다.</p>
+      </div>
+
+      <div class="card-panel grid-2col">
+        <div>
+          <h3 style="font-size: 1.15rem; margin-bottom: 0.75rem;">1. 컴퓨터공학이라고 하면 떠오르는 단어 3가지</h3>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">직업, 활동, 떠오르는 장면이나 궁금한 점 등 무엇이든 좋습니다.</p>
+          <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+            <input type="text" id="pre-kw1" class="form-input" placeholder="키워드 1">
+            <input type="text" id="pre-kw2" class="form-input" placeholder="키워드 2">
+            <input type="text" id="pre-kw3" class="form-input" placeholder="키워드 3">
+          </div>
+        </div>
+
+        <div>
+          <h3 style="font-size: 1.15rem; margin-bottom: 0.75rem;">2. 컴퓨터공학자는 어떤 문제를 해결하는 사람일까요?</h3>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">평소 생각하던 모습을 한 문장으로 편하게 적어보세요. 기술적인 설명이 아니어도 됩니다.</p>
+          <textarea id="pre-thought" class="form-input" rows="4" placeholder="지금 떠오르는 생각을 한 문장으로 적어보세요."></textarea>
+          
+          <div class="discussion-box" style="margin-top: 1rem;">
+            <h5>📌 약속하기</h5>
+            <p style="font-size: 0.85rem;">지금 작성한 첫 생각은 그대로 남겨두고, 수업을 마칠 때 다시 꺼내어 비교합니다.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="survey-pre" class="survey-card"></div>
+
+      <div style="text-align: right;">
+        <button class="btn-primary btn-next-step" data-target="mod1">1단계: 작업 순서 실험실로 이동 ➔</button>
+      </div>
+    </section>
+
+    <!-- ==================== 1. 작업 순서 실험실 ==================== -->
+    <section id="section-mod1" class="app-section hidden">
+      <div class="section-hero" style="margin-bottom: 0.85rem;">
+        <span class="badge badge-primary">STEP 1 | 여러 작업의 순서 정하기</span>
+        <h2 class="section-title" style="font-size: 1.45rem;">CPU 작업 순서 실험</h2>
+        <p class="section-desc">여러 작업 중 무엇을 먼저 처리할지 우선순위를 직접 정해 봅시다.</p>
+      </div>
+
+      <!-- 1. 일체형 상단 제어 바 (알고리즘 탭, 프리셋, 전역 오버헤드 토글) -->
+      <div class="sched-top-command-bar">
+        <div class="sched-tabs-bar" style="margin-bottom: 0;">
+          <button class="sched-mode-tab active" data-mode="our">
+            <span>우선순위</span>
+            <small>직접 정하기</small>
+          </button>
+          <button class="sched-mode-tab" data-mode="fcfs">
+            <span>먼저 들어온 작업부터</span>
+            <small>FCFS</small>
+          </button>
+          <button class="sched-mode-tab" data-mode="rr">
+            <span>조금씩 번갈아</span>
+            <small>Round Robin</small>
+          </button>
+          <button class="sched-mode-tab" data-mode="sjf">
+            <span>짧은 작업부터</span>
+            <small>SJF · 더 알아보기</small>
+          </button>
+        </div>
+
+        <div class="sched-global-settings-group sched-extra-control">
+          <!-- 전역 문맥 교환 오버헤드 (모든 알고리즘 독립 적용!) -->
+          <button id="sched-btn-overhead-toggle" class="btn-overhead-toggle" title="프로세스 교체 시 CPU 상태 교환 지연을 적용합니다.">
+            ⚡ 문맥 교환: <b>없음 (0s)</b>
+          </button>
+
+          <!-- 워크로드 프리셋 드롭다운 (홀수 버스트 기본 추천) -->
+          <div style="display: flex; align-items: center; gap: 0.35rem;">
+            <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary);">프리셋:</span>
+            <select id="mod1-preset-select" class="form-input" style="width: auto; padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+              <option value="odd-burst" selected>⭐ [추천] 홀수 버스트 (1, 3, 5s 조기 반납)</option>
+              <option value="all-at-zero">📌 동시 도착 (0초에 1, 2, 3, 4, 5s)</option>
+              <option value="convoy-odd">📌 호위 효과 (7s 긴 작업 뒤 대기)</option>
+              <option value="classic-textbook">📌 OS 교과서 표준 예제 (Silberschatz)</option>
+              <option value="dynamic-staggered">📌 시간차 도착 (0s, 2s, 4s, 5s, 7s)</option>
+              <option value="interactive-short">📌 초단타 대화형 UI (1s, 2s 위주)</option>
+              <option value="seed">🎲 시드 기반 무작위 생성</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. 알고리즘 개념 브리핑 카드 (라운드로빈 시 인라인 타임 퀀텀 조절기 포함!) -->
+      <div id="sched-mode-desc-banner"></div>
+
+      <!-- 3. 컴팩트 시뮬레이션 제어 바 (스페이스바 중심) -->
+      <div class="sim-controls-and-commentary" style="margin-bottom: 1rem; padding: 0.65rem 1rem;">
+        <div class="scc-top">
+          <button id="sched-btn-next" class="btn-huge-step" title="스페이스바 또는 오른쪽 화살표(→)로 다음 1초 전진">
+            👉 한 단계 실행
+          </button>
+          <button class="scc-btn sched-extra-control" id="sched-btn-prev">◀ 이전 단계</button>
+
+          <div class="clock-badge">
+            <span>⏱ 시각:</span>
+            <span id="sched-clock-val"><b>0초</b></span>
+          </div>
+
+          <div class="scc-btns">
+            <button class="scc-btn" id="sched-btn-play">▶ 자동 실행</button>
+            <button class="scc-btn" id="sched-btn-pause">⏸ 멈추기</button>
+            <button class="scc-btn" id="sched-btn-reset">🔄 처음부터</button>
+            <button class="scc-btn sched-extra-control" id="sched-btn-fast-finish" style="background: rgba(234, 179, 8, 0.25); border-color: #facc15; color: #fef08a;">⏩ 결과까지 보기</button>
+          </div>
+
+          <div class="sched-extra-control" style="align-items: center; gap: 0.4rem; font-size: 0.8rem;">
+            <button id="sched-sound-toggle" class="scc-btn" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">🔊 효과음</button>
+            <span>속도:</span>
+            <select id="sched-speed-select" class="form-input" style="width: auto; padding: 0.2rem 0.4rem; font-size: 0.75rem; background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.3);">
+              <option value="500">0.5s</option>
+              <option value="300" selected>0.3s (보통)</option>
+              <option value="120">0.12s (빠름)</option>
+            </select>
+          </div>
+          <button class="scc-btn" id="sched-btn-toggle-extra" type="button" aria-expanded="false">⚙ 추가 조작</button>
+        </div>
+
+        <div class="scc-commentary-bubble" style="padding: 0.4rem 0.75rem; font-size: 0.88rem;">
+          <span style="font-size: 1rem; margin-right: 0.3rem;">🎙️ 상태:</span>
+          <span id="sched-live-commentary">준비 완료! <b>[👉 다음 1초 (Space 키)]</b>를 눌러 프로세스를 진행하세요.</span>
+        </div>
+      </div>
+
+      <!-- 4. 1920×1080 원스크린 핏 메인 작업대 (2D 매트릭스 ➔ Ready Queue ➔ 간트 차트) -->
+      <div class="card-panel widescreen-workbench-card" style="padding: 1rem; margin-bottom: 1.25rem;">
+        
+        <!-- 먼저 볼 것: 현재 처리 중인 작업과 기다리는 작업 -->
+        <div class="workbench-section-header" style="margin-top: 0.85rem; padding-bottom: 0.35rem; margin-bottom: 0.45rem;">
+          <h4 style="font-size: 0.95rem;">🚶 지금 처리 중인 작업과 기다리는 작업</h4>
+        </div>
+        <div id="sched-dedicated-queue-board" class="dedicated-queue-board" style="padding: 0.65rem 0.85rem;"></div>
+
+        <!-- 핵심 관찰: 프로세스별 실행·대기 시간표 -->
+        <div class="workbench-section-header" style="padding-bottom: 0.4rem; margin: 0.85rem 0 0.5rem;">
+          <h4 style="font-size: 0.95rem;">프로세스별 실행·대기 시간표</h4>
+          <span class="wb-legend">
+            <span class="legend-chip running">■ CPU 실행</span>
+            <span class="legend-chip waiting">▒ ⏳ 대기</span>
+            <span class="legend-chip not-arrived">□ 미도착</span>
+            <span class="legend-chip finished">✓ 완료</span>
+          </span>
+        </div>
+        <div id="sched-2d-matrix-container" class="matrix-fullwidth-wrapper" style="padding: 0.5rem;"></div>
+
+        <!-- 시간선은 세부 시간표 아래에서 전체 결과를 요약 -->
+        <div class="workbench-section-header" style="margin-top: 0.85rem; padding-bottom: 0.35rem; margin-bottom: 0.45rem;">
+          <h4 style="font-size: 0.95rem;">⚡ 시간에 따른 실행 순서</h4>
+        </div>
+        <div id="sched-unified-gantt-container" class="gantt-fullwidth-wrapper" style="padding: 0.65rem;"></div>
+
+      </div>
+
+      <!-- 모드 4: 우선순위 편집 패널 -->
+      <div id="sched-order-editor-box" class="our-order-box" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h4 style="font-size: 1rem; color: var(--primary);">🎯 작업 우선순위 정하기</h4>
+          <span style="font-size: 0.8rem; color: var(--text-secondary);">카드를 드래그하거나 ▲ / ▼ 버튼으로 순위를 바꿔 보세요.</span>
+        </div>
+        <div id="sched-our-order-list" class="our-order-chips-grid"></div>
+        <div class="form-group" style="margin-top: 0.65rem;">
+          <label class="form-label" for="mod1-reason-input">이 우선순위를 선택한 이유 (한 문장):</label>
+          <input type="text" id="mod1-reason-input" class="form-input" placeholder="예: 짧은 작업부터 끝내야 대기실이 비어서">
+        </div>
+      </div>
+
+      <!-- 5. 4대 방식 성적표 비교 (아래로 스크롤 시 확인) -->
+      <details class="card-panel sched-detail-box" style="margin-top: 1.25rem;">
+        <summary>세부 결과와 계산 보기</summary>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <h4 style="font-size: 1.1rem; font-weight: 800;">📈 4대 스케줄링 방식 종합 성적표</h4>
+        </div>
+        <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+          교과서 표준 공식에 따라 각 방식의 평균 대기 시간과 반응 속도를 비교합니다.
+        </p>
+        <div id="sched-metrics-compare-row" class="widescreen-metrics-grid"></div>
+
+      </details>
+
+      <!-- 결과를 본 뒤 이야기하기 -->
+      <div class="card-panel" style="margin-top: 1.25rem;">
+        <div class="team-discussion-worksheet-card">
+          <div class="tdw-header">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 1.2rem;">🤝</span>
+              <div>
+                <h4 style="font-size: 1.05rem; font-weight: 800; color: var(--text-primary); margin: 0;">결과를 보고 우리 모둠의 기준 정하기</h4>
+                <span style="font-size: 0.8rem; color: var(--text-secondary);">어떤 결과를 더 중요하게 볼지 이야기해 보세요.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tdw-questions-grid">
+            <div class="tdw-q-card">
+              <div class="tqc-head">
+                <span class="tqc-badge">열린 질문 1</span>
+                <h5>빠르게 반응하는 것과 전체 일을 빨리 끝내는 것 중 무엇이 중요할까?</h5>
+              </div>
+              <p>사용자가 기다리는 상황과 많은 작업을 처리해야 하는 상황을 떠올려 봅시다.</p>
+            </div>
+
+            <div class="tdw-q-card">
+              <div class="tqc-head">
+                <span class="tqc-badge">열린 질문 2</span>
+                <h5>모든 작업에 공평하게 기회를 주려면 어떤 방법이 좋을까?</h5>
+              </div>
+              <p>먼저 온 작업, 짧은 작업, 오래 기다린 작업을 어떻게 대할지 생각해 봅시다.</p>
+            </div>
+          </div>
+
+          <details class="sched-detail-box compact">
+            <summary>더 알아보기: 작업을 자주 바꿀 때 드는 시간</summary>
+            <p>CPU가 다른 작업으로 넘어갈 때는 상태를 바꾸는 시간이 필요합니다. 추가 조작에서 문맥 교환 시간을 켜고 결과를 비교할 수 있습니다.</p>
+          </details>
+
+          <div class="tdw-decision-box">
+            <h5 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.5rem;">🎯 우리 팀의 최종 설계 기준 선택:</h5>
+            
+            <div class="tdw-criteria-chips">
+              <button type="button" class="btn-criteria-chip active" data-criteria="response">
+                ⚡ <b>빠르게 반응하기</b>
+                <small>사용자가 오래 기다리지 않게 한다</small>
+              </button>
+              <button type="button" class="btn-criteria-chip" data-criteria="throughput">
+                ⏱️ <b>기다림 줄이기</b>
+                <small>가능한 많은 작업을 빨리 끝낸다</small>
+              </button>
+              <button type="button" class="btn-criteria-chip" data-criteria="fairness">
+                ⚖️ <b>공평하게 기회 주기</b>
+                <small>한 작업이 계속 기다리지 않게 한다</small>
+              </button>
+            </div>
+
+            <div class="form-group" style="margin-top: 0.75rem;">
+              <label class="form-label" for="mod1-team-discussion-input">우리 팀이 이 기준을 선택한 이유 및 토론 결론 (2~3문장):</label>
+              <textarea id="mod1-team-discussion-input" class="form-input" rows="2" placeholder="우리 모둠이 이 기준을 중요하게 생각한 이유를 적어보세요."></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem;">
+        <button class="btn-secondary btn-next-step" data-target="pre">◀ 이전 단계</button>
+        <button class="btn-primary btn-next-step" data-target="mod2">2단계: 작업 나누기로 이동 ➔</button>
+      </div>
+    </section>
+
+    <!-- ==================== 2. 작업자 수 실험실 ==================== -->
+    <section id="section-mod2" class="app-section hidden">
+      <div class="section-hero">
+        <span class="badge badge-primary">STEP 2 | 함께 처리할 수 있는 일 찾기</span>
+        <h2 class="section-title">작업을 나누면 항상 빨라질까?</h2>
+        <p class="section-desc">일의 순서와 작업자 수를 바꾸며, 어떤 일을 함께 처리할 수 있는지 비교해 봅시다.</p>
+      </div>
+
+      <div class="tabs-header">
+        <button id="mod2-tab-sim" class="tab-btn active">🧪 작업 구조 비교</button>
+        <button id="mod2-tab-real" class="tab-btn">⚡ 선택: 실제 브라우저 측정</button>
+      </div>
+
+      <!-- 탭 1: 교육용 시뮬레이션 -->
+      <div id="mod2-view-sim">
+        <div class="mod2-guiding-question">
+          <span>먼저 생각하기</span>
+          <strong>작업자를 1명에서 2명, 4명으로 늘리면 모든 일이 그만큼 빨라질까?</strong>
+        </div>
+
+        <div class="sim-selectors-bar">
+          <div class="mod2-selector-group">
+            <span class="mod2-selector-label">1. 일의 구조 선택</span>
+            <div class="button-group">
+              <button class="mod2-type-btn active" data-type="independent">따로 할 수 있는 일</button>
+              <button class="mod2-type-btn" data-type="sequential">앞 결과가 필요한 일</button>
+              <button class="mod2-type-btn mod2-optional-control" data-type="mixed">일부만 나눌 수 있는 일</button>
+            </div>
+          </div>
+
+          <div class="mod2-selector-group">
+            <span class="mod2-selector-label">2. 작업자 수 바꾸기</span>
+            <div class="button-group">
+              <button class="mod2-worker-btn" data-workers="1">1명</button>
+              <button class="mod2-worker-btn active" data-workers="2">2명</button>
+              <button class="mod2-worker-btn" data-workers="4">4명</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-panel grid-left-main">
+          <div id="mod2-sim-metrics">
+            <!-- 지표 요약 렌더링 -->
+          </div>
+          <div id="mod2-sim-stage">
+            <!-- 일꾼 레인 렌더링 -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 탭 2: 브라우저 실제 연산 측정 -->
+      <div id="mod2-view-real" class="hidden">
+        <div class="card-panel">
+          <div class="mod2-worker-explainer">
+            <div>
+              <span class="mod2-explainer-icon">🖥️</span>
+              <strong>화면과 버튼 반응</strong>
+              <p>웹페이지를 보여 주고 입력에 반응합니다.</p>
+            </div>
+            <span class="mod2-explainer-plus">＋</span>
+            <div>
+              <span class="mod2-explainer-icon">🧮</span>
+              <strong>별도 계산 담당 <small>(Web Worker)</small></strong>
+              <p>화면 처리와 떨어진 곳에서 계산을 맡습니다.</p>
+            </div>
+          </div>
+          <p class="mod2-worker-core-note">Web Worker는 프로그램이 만든 실행 단위이고, CPU 코어는 명령을 실제로 처리하는 하드웨어입니다. 둘의 수는 같지 않을 수 있습니다.</p>
+
+          <div class="grid-2col" style="margin-top: 1rem;">
+            <div>
+              <h4 style="margin-bottom: 0.5rem;">측정 전에 예상하기</h4>
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+                별도 계산 담당을 1개 ➔ 2개 ➔ 4개로 늘리면 시간은 어떻게 달라질까요?
+              </p>
+              <input type="text" id="mod2-prediction-input" class="form-input" placeholder="예: 빨라지지만 정확히 2배, 4배는 아닐 것 같다">
+
+              <div style="margin-top: 1.25rem; display: flex; gap: 0.5rem;">
+                <button id="mod2-btn-start-bench" class="btn-primary" style="background: #059669;">▶ 교사 시연 시작</button>
+                <button id="mod2-btn-cancel-bench" class="btn-secondary" disabled>중단</button>
+              </div>
+
+              <div class="bench-progress-bar">
+                <div id="mod2-bench-progress-fill" class="bench-progress-fill"></div>
+              </div>
+              <div id="mod2-bench-status" style="font-size: 0.85rem; color: var(--text-secondary);">
+                같은 계산을 1개·2개·4개의 Web Worker에 나누어 맡깁니다.
+              </div>
+            </div>
+
+            <div>
+              <h4 style="margin-bottom: 0.5rem;">이 컴퓨터의 측정 결과</h4>
+              <div id="mod2-bench-chart">
+                <p style="color: var(--text-muted); font-size: 0.9rem; text-align: center; padding: 3rem 0;">
+                  시연을 시작하면 1개·2개·4개로 계산한 시간이 여기에 표시됩니다.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <details class="sched-detail-box compact mod2-hardware-details">
+            <summary>이 컴퓨터의 처리 장치 정보 보기</summary>
+            <div id="mod2-hw-info"><!-- 하드웨어 감지 정보 --></div>
+          </details>
+        </div>
+      </div>
+
+      <div class="card-panel">
+        <h4 style="margin-bottom: 0.4rem;">비교하고 한 문장으로 정리하기</h4>
+        <input type="text" id="mod2-reflection-input" class="form-input" placeholder="예: 앞 결과를 기다려야 하는 일은 작업자가 많아도 함께 처리하기 어렵다">
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <button class="btn-secondary btn-next-step" data-target="mod1">◀ 이전 단계</button>
+        <button class="btn-primary btn-next-step" data-target="mod3">3단계: 공유 자원으로 이동 ➔</button>
+      </div>
+    </section>
+
+    <!-- ==================== 3. 공유 자원 실험 ==================== -->
+    <section id="section-mod3" class="app-section hidden">
+      <div class="section-hero">
+        <span class="badge badge-primary">STEP 3 | 함께 사용할 때 생기는 문제</span>
+        <h2 class="section-title">여러 작업이 같은 값을 함께 바꾸면 어떻게 될까?</h2>
+        <p class="section-desc">두 작업자가 공동 점수에 각각 1점을 더합니다. 최종 점수가 12가 되는지 단계별로 확인해 봅시다.</p>
+      </div>
+
+      <div class="mod3-prediction-card">
+        <div>
+          <span>먼저 예상하기</span>
+          <strong>10점에서 두 작업자가 1점씩 더하면 마지막 점수는?</strong>
+        </div>
+        <div class="button-group" role="group" aria-label="예상 결과 선택">
+          <button class="mod3-prediction-btn" data-value="11">11점</button>
+          <button class="mod3-prediction-btn" data-value="12">12점</button>
+        </div>
+      </div>
+
+      <div class="tabs-header mod3-mode-tabs" role="tablist" aria-label="실행 규칙 선택">
+        <button class="tab-btn active mod3-mode-btn" data-mode="unlocked">1. 규칙 없이 실행</button>
+        <button class="tab-btn mod3-mode-btn" data-mode="locked">2. 사용 중 표시 켜기 🔒</button>
+      </div>
+
+      <div class="card-panel mod3-lab-card">
+        <div class="mod3-controls-row">
+          <div id="mod3-mode-message" class="mod3-mode-message" aria-live="polite"></div>
+          <div class="button-group">
+            <button id="mod3-step-btn" class="btn-primary">👉 한 단계 실행</button>
+            <button id="mod3-auto-btn" class="btn-secondary">▶ 자동 실행</button>
+            <button id="mod3-pause-btn" class="btn-secondary" disabled>⏸ 멈추기</button>
+            <button id="mod3-reset-btn" class="btn-secondary">🔄 처음부터</button>
+          </div>
+        </div>
+
+        <div class="mod3-shared-stage">
+          <article id="mod3-worker-a" class="mod3-worker-panel" aria-label="작업자 A 상태"></article>
+
+          <div class="mod3-shared-center">
+            <span class="mod3-shared-label">모두가 함께 보는 점수</span>
+            <strong id="mod3-shared-value">10</strong>
+            <span id="mod3-lock-state" class="mod3-lock-state">🔓 사용 중 표시 없음</span>
+          </div>
+
+          <article id="mod3-worker-b" class="mod3-worker-panel" aria-label="작업자 B 상태"></article>
+        </div>
+
+        <div class="mod3-progress-block">
+          <div class="mod3-progress-head">
+            <strong>작업자별 읽기·계산·쓰기 시간표</strong>
+            <span id="mod3-step-counter">0 / 6단계</span>
+          </div>
+          <div class="mod3-timeline-legend" aria-label="시간표 범례">
+            <span class="read">읽기</span><span class="calculate">계산</span><span class="write">쓰기</span>
+            <span class="wait">대기</span><span class="locked">🔒 잠금 중</span>
+          </div>
+          <div class="mod3-timeline-scroll">
+            <table id="mod3-timeline-table" class="mod3-timeline-table" aria-label="공유 자원 작업 시간표"></table>
+          </div>
+          <p id="mod3-current-action" class="mod3-current-action" aria-live="polite">한 단계 실행을 누르면 시간표가 진행됩니다.</p>
+        </div>
+
+        <div id="mod3-result-box" class="mod3-result-box hidden" aria-live="polite"></div>
+      </div>
+
+      <details id="mod3-concept-details" class="card-panel sched-detail-box mod3-concept-details hidden">
+        <summary>관찰한 현상의 컴퓨터공학 용어 보기</summary>
+        <div class="mod3-concept-grid">
+          <div><strong>공유 자원</strong><span>여러 작업이 함께 사용하는 값이나 장치</span></div>
+          <div><strong>경쟁 상태</strong><span>실행 순서에 따라 결과가 달라질 수 있는 상황</span></div>
+          <div><strong>한 번에 하나만 들어가는 구간</strong><span>공유 값을 읽고 계산하고 저장하는 중요한 구간(임계 구역)</span></div>
+          <div><strong>사용 중 표시</strong><span>한 작업이 사용하는 동안 다른 작업을 기다리게 하는 규칙(잠금)</span></div>
+        </div>
+      </details>
+
+      <div class="card-panel">
+        <h4 style="margin-bottom: 0.4rem;">두 실행을 비교하고 정리하기</h4>
+        <input type="text" id="mod3-reflection-input" class="form-input" placeholder="예: 함께 처리할 때는 빠르기뿐 아니라 정확한 결과를 위한 규칙도 필요하다">
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <button class="btn-secondary btn-next-step" data-target="mod2">◀ 이전 단계</button>
+        <button class="btn-primary btn-next-step" data-target="mod4">4단계: 분야 연결로 이동 ➔</button>
+      </div>
+    </section>
+
+    <!-- ==================== 4. 서비스와 컴퓨터공학 분야 연결 ==================== -->
+    <section id="section-mod4" class="app-section hidden">
+      <div class="section-hero">
+        <span class="badge badge-primary">STEP 4 | 하나의 서비스를 만드는 여러 분야</span>
+        <h2 class="section-title">이 서비스에는 어떤 컴퓨터공학이 필요할까?</h2>
+        <p class="section-desc">서비스에 필요한 일을 읽고 관련 분야를 연결해 봅시다. 하나의 일은 여러 분야와 연결될 수 있습니다.</p>
+      </div>
+
+      <div class="card-panel mod4-linking-card">
+        <div class="mod4-toolbar">
+          <label for="mod4-scenario-select">서비스 선택</label>
+          <select id="mod4-scenario-select" class="form-input">
+            <option value="game">🎮 온라인 게임</option>
+            <option value="video">🎬 동영상 검색과 재생</option>
+            <option value="shopping">🛒 온라인 주문과 결제</option>
+            <option value="photo">📷 사진 저장과 계산</option>
+          </select>
+          <button id="mod4-random-btn" class="btn-secondary">🎲 무작위 선택</button>
+          <div class="mod4-toolbar-spacer"></div>
+          <button id="mod4-example-btn" class="btn-secondary" aria-pressed="false">가능한 구성 예시 보기</button>
+          <button id="mod4-reset-btn" class="btn-secondary">초기화</button>
+        </div>
+
+        <div id="mod4-link-instruction" class="mod4-link-instruction" aria-live="polite">
+          왼쪽에서 필요한 일 하나를 고른 뒤, 오른쪽에서 관련 분야를 선택하세요.
+        </div>
+
+        <div class="mod4-link-workspace">
+          <section class="mod4-link-column" aria-labelledby="mod4-role-heading">
+            <div class="mod4-column-heading">
+              <span>1</span>
+              <div><h3 id="mod4-role-heading">서비스에 필요한 일</h3><p>먼저 하나를 선택하세요.</p></div>
+            </div>
+            <div id="mod4-role-list" class="mod4-card-list"></div>
+          </section>
+
+          <section class="mod4-link-column" aria-labelledby="mod4-field-heading">
+            <div class="mod4-column-heading">
+              <span>2</span>
+              <div><h3 id="mod4-field-heading">관련 있는 컴퓨터공학 분야</h3><p>여러 개를 선택해도 됩니다.</p></div>
+            </div>
+            <div id="mod4-field-list" class="mod4-field-grid"></div>
+          </section>
+        </div>
+
+        <div class="mod4-summary-row">
+          <div>
+            <strong>현재 연결</strong>
+            <span id="mod4-connection-count">0개</span>
+          </div>
+          <p id="mod4-connection-summary">역할을 선택하면 연결한 분야가 여기에 표시됩니다.</p>
+        </div>
+
+        <section class="mod4-overview" aria-labelledby="mod4-overview-title">
+          <div class="mod4-overview-heading">
+            <div>
+              <h3 id="mod4-overview-title">서비스 전체 연결 지도</h3>
+              <p>각각의 일을 만드는 데 어떤 분야가 필요한지 한눈에 확인합니다.</p>
+            </div>
+            <strong id="mod4-overview-progress" aria-live="polite">0 / 6개 연결</strong>
+          </div>
+          <div id="mod4-overview-grid" class="mod4-overview-grid"></div>
+        </section>
+
+        <div class="mod4-reflection-grid">
+          <label>
+            <span>이렇게 연결한 이유</span>
+            <input id="mod4-reason-input" class="form-input" type="text" placeholder="예: 로그인 정보를 지키려면 보안뿐 아니라 서버와 네트워크도 필요하다">
+          </label>
+          <label>
+            <span>더 알아보고 싶은 분야</span>
+            <select id="mod4-interest-select" class="form-input">
+              <option value="">하나를 선택하세요</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <button class="btn-secondary btn-next-step" data-target="mod3">◀ 이전 단계</button>
+        <button class="btn-primary btn-next-step" data-target="post">5단계: 수업 전후 생각 비교로 이동 ➔</button>
+      </div>
+    </section>
+
+    <!-- ==================== 5. 생각 비교 및 마무리 ==================== -->
+    <section id="section-post" class="app-section hidden">
+      <div class="section-hero">
+        <span class="badge badge-primary">STEP 5 | 성찰 및 종합</span>
+        <h2 class="section-title">수업 전 생각과 지금의 생각 비교</h2>
+        <p class="section-desc">오늘 살펴본 여러 문제를 떠올리며, 처음 가졌던 생각과 지금의 생각을 나란히 비교해 봅니다.</p>
+      </div>
+
+      <div class="reflection-side-by-side">
+        <article class="card-panel reflection-before-panel">
+          <div class="reflection-panel-heading">
+            <span class="reflection-step-badge before">수업 전</span>
+            <div><h3>처음에 적었던 생각</h3><p>처음 답은 고치지 않고 그대로 비교합니다.</p></div>
+          </div>
+          <div id="reflection-compare-view"></div>
+        </article>
+
+        <article class="card-panel reflection-after-panel">
+          <div class="reflection-panel-heading">
+            <span class="reflection-step-badge after">지금</span>
+            <div><h3>지금의 생각</h3><p>정답보다 달라진 생각과 궁금한 점이 중요합니다.</p></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="post-field">새롭게 알게 된 분야나 문제</label>
+            <input type="text" id="post-field" class="form-input" placeholder="예: 여러 작업이 같은 값을 바꿀 때 생기는 문제">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="post-diff">처음 생각과 달라진 점</label>
+            <textarea id="post-diff" class="form-input" rows="3" placeholder="예: 코딩만 하는 줄 알았는데 컴퓨터가 일을 처리하는 방법도 연구한다는 것을 알았다"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="post-q">더 알아보고 싶은 질문</label>
+            <input type="text" id="post-q" class="form-input" placeholder="예: 온라인 게임 서버는 많은 사람의 요청을 어떻게 처리할까?">
+          </div>
+          <div id="reflection-post-progress" class="reflection-post-progress" aria-live="polite"></div>
+        </article>
+      </div>
+
+      <div id="survey-post" class="survey-card"></div>
+
+      <!-- 최종 엔딩 배너 -->
+      <div class="card-panel reflection-final-banner">
+        <span class="badge badge-accent">오늘 남길 문장</span>
+        <h3>
+          코딩은 컴퓨터공학의 중요한 도구입니다.<br>
+          컴퓨터공학은 컴퓨터로 여러 문제를 해결하는 다양한 분야로 이루어져 있습니다.
+        </h3>
+        <p>처음 적은 생각과 지금의 생각이 어떻게 달라졌는지 확인해 보세요.</p>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem;">
+        <button class="btn-secondary btn-next-step" data-target="mod4">◀ 이전 단계</button>
+        <button class="btn-secondary" onclick="window.print()">🖨️ 활동 결과 인쇄 / PDF 저장</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== 강사 모드 모달 ==================== -->
+  <div id="teacher-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="teacher-modal-title">
+    <div class="teacher-modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3 id="teacher-modal-title" style="font-size: 1.35rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+          <span>👨‍🏫</span> 강사용 진행 도구
+        </h3>
+        <button id="btn-close-teacher-modal" class="btn-secondary" style="padding: 0.3rem 0.6rem;">닫기 ✕</button>
+      </div>
+
+      <!-- 1. 대형 활동 타이머 -->
+      <div class="teacher-timer-hero">
+        <div style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 0.25rem;">활동 타이머</div>
+        <div id="teacher-timer-display" class="timer-digits" aria-live="polite">05:00</div>
+        
+        <div class="timer-btn-row">
+          <button id="teacher-timer-start" class="btn-primary" style="background: #059669; padding: 0.5rem 1.2rem;">▶ 타이머 시작</button>
+          <button id="teacher-timer-pause" class="btn-secondary" style="padding: 0.5rem 1.2rem;">⏸ 일시정지</button>
+          <button id="teacher-timer-reset" class="btn-secondary" style="padding: 0.5rem 1.2rem;">🔄 초기화</button>
+        </div>
+
+        <div class="teacher-timer-settings">
+          <div class="timer-preset-row">
+            <button class="btn-secondary btn-timer-preset" data-mins="3">3분</button>
+            <button class="btn-secondary btn-timer-preset" data-mins="5">5분</button>
+            <button class="btn-secondary btn-timer-preset" data-mins="8">8분</button>
+            <button class="btn-secondary btn-timer-preset" data-mins="10">10분</button>
+          </div>
+          <div class="timer-custom-row">
+            <label for="teacher-timer-minutes">직접 설정</label>
+            <input id="teacher-timer-minutes" class="form-input" type="number" min="1" max="99" value="5" inputmode="numeric">
+            <button id="teacher-timer-apply" class="btn-secondary">분 적용</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. 공통 시드 관리 -->
+      <div class="card-panel" style="margin-bottom: 1rem;">
+        <h4 style="font-size: 1rem; margin-bottom: 0.5rem;">공통 문제 번호 설정</h4>
+        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.6rem;">
+          학생들이 같은 번호를 입력하면 같은 작업 순서 문제를 사용할 수 있습니다.
+        </p>
+        <div style="display: flex; gap: 0.5rem;">
+          <input type="text" id="teacher-seed-input" class="form-input" style="font-family: monospace; font-weight: 700; width: 180px;" value="CS-DEMO-01">
+          <button id="teacher-btn-apply-seed" class="btn-primary">문제 번호 적용</button>
+          <button id="teacher-btn-gen-seed" class="btn-secondary">새 번호 만들기</button>
+        </div>
+        <div id="teacher-action-status" class="teacher-action-status" aria-live="polite"></div>
+      </div>
+
+      <!-- 3. 빠른 화면 전환 & 초기화 -->
+      <div class="card-panel">
+        <h4 style="font-size: 1rem; margin-bottom: 0.5rem;">활동 바로가기 및 관리</h4>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+          <button class="btn-secondary btn-quick-nav" data-target="pre">0. 첫 생각</button>
+          <button class="btn-secondary btn-quick-nav" data-target="mod1">1. 작업 순서</button>
+          <button class="btn-secondary btn-quick-nav" data-target="mod2">2. 작업 나누기</button>
+          <button class="btn-secondary btn-quick-nav" data-target="mod3">3. 공유 자원</button>
+          <button class="btn-secondary btn-quick-nav" data-target="mod4">4. 분야 연결</button>
+          <button class="btn-secondary btn-quick-nav" data-target="post">5. 생각 비교</button>
+        </div>
+        <div class="teacher-reset-row">
+          <button id="teacher-btn-reset-current" class="btn-secondary">현재 활동만 초기화</button>
+          <button id="teacher-btn-reset-all" class="btn-secondary" style="color: #ef4444; border-color: #fecaca; background: #fff5f5;">
+            이 브라우저의 모든 수업 데이터 초기화
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 스크립트 로드 (외부 CDN 완전 배제, 오프라인 100% 작동) -->
+  <script src="js/seed.js?v=17"></script>
+  <script src="js/module1_scheduling.js?v=17"></script>
+  <script src="js/module2_workers.js?v=17"></script>
+  <script src="js/module3_shared_resource.js?v=17"></script>
+  <script src="js/module4_service_fields.js?v=17"></script>
+  <script src="js/reflection.js?v=17"></script>
+  <script src="js/survey_config.js?v=17"></script>
+  <script src="js/survey_sync.js?v=17"></script>
+  <script src="js/teacher_mode.js?v=17"></script>
+  <script src="js/app.js?v=17"></script>
+</body>
+</html>
